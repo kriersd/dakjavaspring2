@@ -1,0 +1,42 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: "dakjavaspring2-service"
+spec:
+  # if your cluster supports it, uncomment the following to automatically create
+  # an external load-balanced IP for the frontend service.
+  #type: LoadBalancer
+  type: NodePort
+  ports:
+  # the port that this service should serve on
+  - name: http
+    port: 8080
+
+  selector:
+    app: "dakjavaspring2-selector"
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: "dakjavaspring2-deployment"
+spec:
+  # this replicas value is default
+  # modify it according to your case
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: "dakjavaspring2-selector"
+    spec:
+      containers:
+      - name: dakjavaspring2
+        image: dakjavaspring2:latest
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 20
+        # resources:
+        #   requests:
+        #     cpu: 100m
+        #     memory: 100Mi
